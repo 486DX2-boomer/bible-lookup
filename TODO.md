@@ -2,6 +2,17 @@
 
 Feature ideas, roughly ordered by value-to-effort. No ELPA/MELPA submission planned.
 
+## Longer-term proposals (in priority order)
+
+1. Concordance / lexicon search: a command targeting a provider that offers
+   original-language tooling — e.g. Blue Letter Bible's Hebrew/Greek search
+   from an English definition. Drops in alongside the existing commands
+   without changing anything we already have.
+2. Backend system: abstract the provider so lookups can target sites other
+   than BibleGateway (e.g. Blue Letter Bible). Extensive change — rewrites
+   much of the URL building and version handling — so on hold for now, but
+   kept in mind as the eventual direction.
+
 ## Rejected
 
 - Fetch into a buffer: would mean API calls, then caching, then probably
