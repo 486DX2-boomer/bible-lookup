@@ -2,12 +2,6 @@
 
 Feature ideas, roughly ordered by value-to-effort. No ELPA/MELPA submission planned.
 
-## Version picker on prefix argument
-
-`C-u M-x bible-lookup` prompts for the translation for that one lookup
-(completing-read over common codes: KJV, ESV, NIV, NASB, NKJV, ...) without
-changing `bible-lookup-version`.
-
 ## Fetch into a buffer (larger scope — decide deliberately)
 
 Display the passage in an Emacs buffer instead of the browser. Scraping
@@ -27,6 +21,9 @@ this mode. Substantially changes the package's "thin wrapper" scope.
 
 ## Done
 
+- v0.3.0: version picker on prefix argument (`C-u` prompts for the translation
+  for one lookup via non-strict completion over `bible-lookup-version-codes`,
+  a defcustom; works in both commands).
 - v0.2.0: `bible-lookup-at-point` (regex over the current line, match whose
   bounds contain point, book names + abbreviations via `regexp-opt`), book-name
   completion in the `bible-lookup` prompt, and at-point reference as the

@@ -1,7 +1,7 @@
 ;;; bible-lookup.el --- Look up Bible passages on BibleGateway  -*- lexical-binding: t; -*-
 
 ;; Author: Danny Feller <danny@dfeller.xyz>
-;; Version: 0.2.0
+;; Version: 0.3.0
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: convenience, hypermedia
 ;; URL: https://github.com/486DX2-boomer/bible-lookup
@@ -34,6 +34,14 @@
 This is the version code BibleGateway expects, e.g. \"KJV\",
 \"ESV\", \"NIV\", or \"NASB\"."
   :type 'string
+  :group 'bible-lookup)
+
+(defcustom bible-lookup-version-codes
+  '("KJV" "NKJV" "ESV" "NIV" "NASB" "NLT" "CSB" "AMP" "MSG" "RSV")
+  "Version codes offered when prompting for a translation.
+Completion is not strict; any code BibleGateway recognizes may be
+entered even if it is not in this list."
+  :type '(repeat string)
   :group 'bible-lookup)
 
 (defconst bible-lookup-base-url "https://www.biblegateway.com/passage/"
@@ -83,6 +91,16 @@ an optional \":verse\" and \"-range\".")
 (defvar bible-lookup-history nil
   "Minibuffer history for `bible-lookup'.")
 
+(defvar bible-lookup-version-history nil
+  "Minibuffer history for translation prompts.")
+
+(defun bible-lookup--read-version ()
+  "Prompt for a translation code, defaulting to `bible-lookup-version'."
+  (completing-read
+   (format "Translation (default %s): " bible-lookup-version)
+   bible-lookup-version-codes
+   nil nil nil 'bible-lookup-version-history bible-lookup-version))
+
 (defun bible-lookup--build-url (reference)
   "Return the BibleGateway URL for REFERENCE.
 REFERENCE is a string such as \"Genesis 1:1\" or \"Psalm 23\".
@@ -122,33 +140,44 @@ programmed completion."
     (complete-with-action action bible-lookup--book-names string pred))))
 
 ;;;###autoload
-(defun bible-lookup (reference)
+(defun bible-lookup (reference &optional version)
   "Look up REFERENCE on BibleGateway in the default browser.
 REFERENCE may name a chapter and verse (\"Genesis 1:1\"), a verse
 range (\"John 3:16-17\"), or just a chapter (\"Psalm 23\").
 Interactively, prompt for the reference in the minibuffer with
-completion on book names, defaulting to the reference at point."
+completion on book names, defaulting to the reference at point.
+Optional argument VERSION overrides `bible-lookup-version' for
+this lookup; interactively, a prefix argument (\\[universal-argument]) prompts
+for it."
   (interactive
-   (let ((default (bible-lookup--reference-at-point)))
+   (let* ((version (and current-prefix-arg (bible-lookup--read-version)))
+          (default (bible-lookup--reference-at-point)))
      (list (completing-read
             (format "Bible reference (%s)%s: "
-                    bible-lookup-version
+                    (or version bible-lookup-version)
                     (if default (format " (default %s)" default) ""))
             #'bible-lookup--completion-table
-            nil nil nil 'bible-lookup-history default))))
+            nil nil nil 'bible-lookup-history default)
+           version)))
   (when (string-blank-p reference)
     (user-error "No reference given"))
-  (browse-url (bible-lookup--build-url (string-trim reference))))
+  (let ((bible-lookup-version (or version bible-lookup-version)))
+    (browse-url (bible-lookup--build-url (string-trim reference)))))
 
 ;;;###autoload
-(defun bible-lookup-at-point ()
+(defun bible-lookup-at-point (&optional version)
   "Look up the Bible reference at point on BibleGateway.
-Signal an error if no reference is found under the cursor."
-  (interactive)
+Signal an error if no reference is found under the cursor.
+Optional argument VERSION overrides `bible-lookup-version' for
+this lookup; interactively, a prefix argument (\\[universal-argument]) prompts
+for it."
+  (interactive
+   (list (and current-prefix-arg (bible-lookup--read-version))))
   (let ((reference (bible-lookup--reference-at-point)))
     (unless reference
       (user-error "No Bible reference at point"))
-    (browse-url (bible-lookup--build-url reference))))
+    (let ((bible-lookup-version (or version bible-lookup-version)))
+      (browse-url (bible-lookup--build-url reference)))))
 
 (provide 'bible-lookup)
 ;;; bible-lookup.el ends here
