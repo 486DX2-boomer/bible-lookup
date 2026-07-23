@@ -4,7 +4,7 @@
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: convenience, hypermedia
-;; URL: https://github.com/dfeller/bible-lookup
+;; URL: https://github.com/486DX2-boomer/bible-lookup
 
 ;; This file is not part of GNU Emacs.
 
