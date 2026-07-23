@@ -10,17 +10,12 @@
 
 ;;; Commentary:
 
-;; Provides the command `bible-lookup', which prompts in the minibuffer
-;; for a Bible reference (e.g. "Genesis 1:1" or "Psalm 23") and opens
-;; the matching passage on biblegateway.com in your default browser.
-;; The prompt completes book names (e.g. "gen TAB" -> "Genesis") and
-;; defaults to the reference at point when there is one.
-;;
-;; The companion command `bible-lookup-at-point' skips the prompt and
+;; `bible-lookup' prompts for a Bible reference (with book-name
+;; completion, defaulting to the reference at point) and opens it on
+;; biblegateway.com in your default browser.  `bible-lookup-at-point'
 ;; opens the reference under the cursor directly.
 ;;
-;; The translation defaults to KJV and can be changed via
-;; `bible-lookup-version':
+;; The translation defaults to KJV:
 ;;
 ;;   (setq bible-lookup-version "ESV")
 
@@ -72,9 +67,7 @@ This is the version code BibleGateway expects, e.g. \"KJV\",
     "Gal" "Eph" "Phil" "Col" "1 Thess" "2 Thess"
     "1 Tim" "2 Tim" "Tit" "Phlm" "Philem" "Heb" "Jas"
     "1 Pet" "2 Pet" "1 Jn" "2 Jn" "3 Jn" "Rev")
-  "Common book-name abbreviations recognized when matching at point.
-BibleGateway resolves these server-side, so they are passed
-through verbatim like full names.")
+  "Common book-name abbreviations recognized when matching at point.")
 
 (defconst bible-lookup--reference-re
   (concat "\\b\\(?:"
@@ -84,11 +77,8 @@ through verbatim like full names.")
           "\\(?::[0-9]+\\)?"
           "\\(?:[-–][0-9]+\\(?::[0-9]+\\)?\\)?")
   "Regexp matching a Bible reference such as \"Isaiah 23:1\".
-Matches a known book name or abbreviation (optionally followed by
-a period), a chapter number, an optional \":verse\", and an
-optional \"-range\" (which may itself be \"chapter:verse\" for
-cross-chapter ranges).  The range dash may be a hyphen or an
-en dash.")
+Matches a known book name or abbreviation, a chapter number, and
+an optional \":verse\" and \"-range\".")
 
 (defvar bible-lookup-history nil
   "Minibuffer history for `bible-lookup'.")
@@ -102,9 +92,7 @@ The translation is taken from `bible-lookup-version'."
           "&version=" (url-hexify-string bible-lookup-version)))
 
 (defun bible-lookup--reference-at-point ()
-  "Return the Bible reference at point, or nil if there is none.
-Scans the current line for matches of `bible-lookup--reference-re'
-and returns the one whose bounds contain point."
+  "Return the Bible reference at point, or nil if there is none."
   (let ((case-fold-search t)
         (pt (point))
         (found nil))
@@ -120,11 +108,8 @@ and returns the one whose bounds contain point."
 
 (defun bible-lookup--completion-table (string pred action)
   "Completion table for Bible references.
-Completes STRING against `bible-lookup--book-names' while the
-book name is still being typed; once a chapter number follows the
-book, STRING is accepted as-is so \"Genesis 1:1\" can be entered
-freehand.  Candidates keep traditional book order rather than the
-completion UI's default sort.  PRED and ACTION are as for
+Completes STRING against book names until a chapter number
+follows, then accepts STRING as-is.  PRED and ACTION are as for
 programmed completion."
   (cond
    ((eq action 'metadata)
