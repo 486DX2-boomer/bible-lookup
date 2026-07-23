@@ -1,7 +1,7 @@
 ;;; bible-lookup.el --- Look up Bible passages on BibleGateway  -*- lexical-binding: t; -*-
 
 ;; Author: Danny Feller <danny@dfeller.xyz>
-;; Version: 0.3.0
+;; Version: 0.4.0
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: convenience, hypermedia
 ;; URL: https://github.com/486DX2-boomer/bible-lookup
@@ -176,8 +176,23 @@ for it."
   (let ((reference (bible-lookup--reference-at-point)))
     (unless reference
       (user-error "No Bible reference at point"))
+    (add-to-history 'bible-lookup-history reference)
     (let ((bible-lookup-version (or version bible-lookup-version)))
       (browse-url (bible-lookup--build-url reference)))))
+
+;;;###autoload
+(defun bible-lookup-again (&optional version)
+  "Reopen the most recently looked-up Bible reference.
+Optional argument VERSION overrides `bible-lookup-version' for
+this lookup; interactively, a prefix argument (\\[universal-argument]) prompts
+for it, making it easy to reread the same passage in another
+translation."
+  (interactive
+   (list (and current-prefix-arg (bible-lookup--read-version))))
+  (unless bible-lookup-history
+    (user-error "No previous lookup"))
+  (let ((bible-lookup-version (or version bible-lookup-version)))
+    (browse-url (bible-lookup--build-url (car bible-lookup-history)))))
 
 (provide 'bible-lookup)
 ;;; bible-lookup.el ends here

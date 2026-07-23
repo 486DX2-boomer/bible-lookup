@@ -7,8 +7,6 @@ Feature ideas, roughly ordered by value-to-effort. No ELPA/MELPA submission plan
 - Parallel passage view: BibleGateway supports `version=KJV;ESV` for
   side-by-side translations; prompt for two versions. Browser-based, no
   in-buffer rendering involved.
-- `bible-lookup-again`: reopen the last reference (or same reference in a
-  different version) using the existing history variable.
 - Org-mode link type: register a `bible:` link so `[[bible:John 3:16]]` is
   clickable and exports properly.
 - Keyword search mode: `bible-search` command using BibleGateway's quicksearch
@@ -22,6 +20,9 @@ Feature ideas, roughly ordered by value-to-effort. No ELPA/MELPA submission plan
 
 ## Done
 
+- v0.4.0: `bible-lookup-again` reopens the last lookup (prefix arg = different
+  translation); `bible-lookup-at-point` now records what it opens in
+  `bible-lookup-history`.
 - v0.3.0: version picker on prefix argument (`C-u` prompts for the translation
   for one lookup via non-strict completion over `bible-lookup-version-codes`,
   a defcustom; works in both commands).
