@@ -2,32 +2,6 @@
 
 Feature ideas, roughly ordered by value-to-effort. No ELPA/MELPA submission planned.
 
-## Lookup at point (high priority)
-
-`bible-lookup-at-point`: grab a reference under the cursor and open it directly.
-Also make the regular `bible-lookup` prompt pre-fill with the reference at point
-as its default.
-
-Implementation notes (from design discussion):
-
-- Not lookahead/guessing — match a regex against text already in the buffer.
-  Take the current line as the search window, walk matches forward from
-  line-beginning, and pick the match whose bounds contain point
-  (`(<= (match-beginning 0) point (match-end 0))`).
-- Pattern shape: optional leading `1 `/`2 `/`3 `, book name, whitespace, chapter
-  digits, optional `:verse` and `-range`.
-- Build the book-name part from the 66 book names + standard abbreviations via
-  `regexp-opt`, not `[A-Za-z]+` — prevents false positives like `Windows 11:30`
-  or `ratio 16:9`.
-- No chapter/verse-length validation needed: the match can only capture
-  characters literally present in the buffer, and invalid references just get a
-  "no results" page from BibleGateway (same delegation philosophy as the prompt).
-
-## Book name completion
-
-`completing-read` over the 66 book names so `gen TAB` → `Genesis`, then append
-`1:1` freehand. Shares the book-name data with lookup-at-point.
-
 ## Version picker on prefix argument
 
 `C-u M-x bible-lookup` prompts for the translation for that one lookup
@@ -50,3 +24,10 @@ this mode. Substantially changes the package's "thin wrapper" scope.
   clickable and exports properly.
 - Keyword search mode: `bible-search` command using BibleGateway's quicksearch
   for word/phrase queries, not just references.
+
+## Done
+
+- v0.2.0: `bible-lookup-at-point` (regex over the current line, match whose
+  bounds contain point, book names + abbreviations via `regexp-opt`), book-name
+  completion in the `bible-lookup` prompt, and at-point reference as the
+  prompt's default.

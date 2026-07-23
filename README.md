@@ -2,7 +2,9 @@
 
 An Emacs package for looking up Bible passages on [BibleGateway](https://www.biblegateway.com/).
 
-`M-x bible-lookup` prompts in the minibuffer for a reference — chapter and verse (`Genesis 1:1`), a range (`John 3:16-17`), or just a chapter (`Psalm 23`) — and opens the matching passage in your default browser.
+`M-x bible-lookup` prompts in the minibuffer for a reference — chapter and verse (`Genesis 1:1`), a range (`John 3:16-17`), or just a chapter (`Psalm 23`) — and opens the matching passage in your default browser. The prompt completes book names (`gen TAB` → `Genesis`), and when the cursor is already on a reference, that reference is offered as the default.
+
+`M-x bible-lookup-at-point` skips the prompt entirely: it opens the reference under the cursor, recognizing full book names and common abbreviations (`Isa 23:1`, `1 Cor 13`, `Gen. 1:1-5`).
 
 ## Installation
 
@@ -17,7 +19,7 @@ Or with `use-package` from a local checkout:
 ```elisp
 (use-package bible-lookup
   :load-path "/path/to/bible-lookup/"
-  :commands (bible-lookup))
+  :commands (bible-lookup bible-lookup-at-point))
 ```
 
 ## Configuration
@@ -121,6 +123,24 @@ Because the interactive spec is separate from the function body, the function is
 ```
 
 If the user just hits RET on an empty prompt, `user-error` aborts with a message in the echo area. It's deliberately `user-error` rather than `error` — it signals "you did something wrong," not "the code is broken," so it doesn't trigger the debugger even when debugging is enabled. Otherwise stray whitespace is trimmed and the built URL is handed to `browse-url`, which dispatches to the OS default browser (respecting any user customization of `browse-url-browser-function`).
+
+### Reference detection and completion (v0.2.0)
+
+Three pieces power `bible-lookup-at-point` and the smarter prompt:
+
+- `bible-lookup--reference-re` is built at load time with `regexp-opt` over the
+  66 book names plus common abbreviations, followed by chapter digits and an
+  optional `:verse` / `-range`. Restricting the book part to known names is what
+  prevents false positives like `Windows 11:30`.
+- `bible-lookup--reference-at-point` scans the current line for matches of that
+  regex and returns the one whose bounds contain point. It only ever captures
+  text literally present in the buffer — invalid references simply produce a
+  "no results" page on BibleGateway, consistent with the package's
+  no-validation philosophy.
+- `bible-lookup--completion-table` is a programmed completion table: while the
+  input still looks like a partial book name it completes against the book
+  list; once a chapter number follows the book, the string is accepted as-is so
+  `Genesis 1:1` can be finished freehand.
 
 ### The footer
 
