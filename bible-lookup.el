@@ -1,6 +1,6 @@
 ;;; bible-lookup.el --- Look up Bible passages on BibleGateway  -*- lexical-binding: t; -*-
 
-;; Author: Danny Feller <dfeller@thesoundofit.com>
+;; Author: Danny Feller <danny@dfeller.xyz>
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: convenience, hypermedia
