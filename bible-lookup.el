@@ -123,10 +123,18 @@ and returns the one whose bounds contain point."
 Completes STRING against `bible-lookup--book-names' while the
 book name is still being typed; once a chapter number follows the
 book, STRING is accepted as-is so \"Genesis 1:1\" can be entered
-freehand.  PRED and ACTION are as for programmed completion."
-  (if (string-match-p "[A-Za-z]\\.?\\s-+[0-9]" string)
-      (complete-with-action action (list string) string pred)
-    (complete-with-action action bible-lookup--book-names string pred)))
+freehand.  Candidates keep traditional book order rather than the
+completion UI's default sort.  PRED and ACTION are as for
+programmed completion."
+  (cond
+   ((eq action 'metadata)
+    '(metadata (category . bible-reference)
+               (display-sort-function . identity)
+               (cycle-sort-function . identity)))
+   ((string-match-p "[A-Za-z]\\.?\\s-+[0-9]" string)
+    (complete-with-action action (list string) string pred))
+   (t
+    (complete-with-action action bible-lookup--book-names string pred))))
 
 ;;;###autoload
 (defun bible-lookup (reference)
