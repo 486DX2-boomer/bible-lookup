@@ -236,7 +236,7 @@ translations."
 
 ;;;###autoload
 (defun bible-lookup-search (query &optional version)
-  "Search BibleGateway for QUERY, a word or phrase (\"amazing grace\").
+  "Search BibleGateway for QUERY, a word or phrase (\"in Christ\").
 Unlike `bible-lookup', this is a keyword search across the whole
 text, not a reference lookup.  Optional argument VERSION overrides
 `bible-lookup-version' for this search; interactively, a prefix

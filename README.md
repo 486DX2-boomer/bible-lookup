@@ -8,7 +8,7 @@ Look up Bible passages on [BibleGateway](https://www.biblegateway.com/) from Ema
 - `M-x bible-lookup-at-point` — open the reference under the cursor directly. Recognizes full book names and common abbreviations (`Isa 23:1`, `1 Cor 13`, `Gen. 1:1-5`).
 - `M-x bible-lookup-again` — reopen the last reference you looked up. With `C-u`, same passage in a different translation.
 - `M-x bible-lookup-parallel` — prompt for a reference and two translations, then open them side by side on BibleGateway.
-- `M-x bible-lookup-search` — keyword search across the whole text (`amazing grace`), not a reference lookup. With `C-u`, prompts for the translation.
+- `M-x bible-lookup-search` — keyword search across the whole text (`in Christ`), not a reference lookup. With `C-u`, prompts for the translation.
 
 With a prefix argument (`C-u`), either command first prompts for the translation for that one lookup, without changing `bible-lookup-version`.
 
