@@ -1,7 +1,7 @@
 ;;; bible-lookup.el --- Look up Bible passages on BibleGateway  -*- lexical-binding: t; -*-
 
 ;; Author: Danny Feller <danny@dfeller.xyz>
-;; Version: 0.5.0
+;; Version: 0.6.0
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: convenience, hypermedia
 ;; URL: https://github.com/486DX2-boomer/bible-lookup
@@ -46,6 +46,9 @@ entered even if it is not in this list."
 
 (defconst bible-lookup-base-url "https://www.biblegateway.com/passage/"
   "Base URL for BibleGateway passage lookups.")
+
+(defconst bible-lookup-search-url "https://www.biblegateway.com/quicksearch/"
+  "Base URL for BibleGateway keyword searches.")
 
 (defconst bible-lookup--book-names
   '("Genesis" "Exodus" "Leviticus" "Numbers" "Deuteronomy"
@@ -93,6 +96,9 @@ an optional \":verse\" and \"-range\".")
 
 (defvar bible-lookup-version-history nil
   "Minibuffer history for translation prompts.")
+
+(defvar bible-lookup-search-history nil
+  "Minibuffer history for `bible-lookup-search'.")
 
 (defun bible-lookup--read-version (&optional prompt default)
   "Prompt for a translation code with completion.
@@ -227,6 +233,27 @@ translations."
     (user-error "Two translations are required"))
   (browse-url (bible-lookup--build-url (string-trim reference)
                                        (list version-a version-b))))
+
+;;;###autoload
+(defun bible-lookup-search (query &optional version)
+  "Search BibleGateway for QUERY, a word or phrase (\"amazing grace\").
+Unlike `bible-lookup', this is a keyword search across the whole
+text, not a reference lookup.  Optional argument VERSION overrides
+`bible-lookup-version' for this search; interactively, a prefix
+argument (\\[universal-argument]) prompts for it."
+  (interactive
+   (let ((version (and current-prefix-arg
+                       (bible-lookup--read-version nil bible-lookup-version))))
+     (list (read-string
+            (format "Bible search (%s): " (or version bible-lookup-version))
+            nil 'bible-lookup-search-history)
+           version)))
+  (when (string-blank-p query)
+    (user-error "No search query given"))
+  (browse-url
+   (concat bible-lookup-search-url
+           "?quicksearch=" (url-hexify-string (string-trim query))
+           "&version=" (url-hexify-string (or version bible-lookup-version)))))
 
 (provide 'bible-lookup)
 ;;; bible-lookup.el ends here

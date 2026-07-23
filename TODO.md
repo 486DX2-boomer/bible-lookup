@@ -2,11 +2,6 @@
 
 Feature ideas, roughly ordered by value-to-effort. No ELPA/MELPA submission planned.
 
-## Smaller conveniences
-
-- Keyword search mode: `bible-search` command using BibleGateway's quicksearch
-  for word/phrase queries, not just references.
-
 ## Rejected
 
 - Fetch into a buffer: would mean API calls, then caching, then probably
@@ -16,6 +11,10 @@ Feature ideas, roughly ordered by value-to-effort. No ELPA/MELPA submission plan
 
 ## Done
 
+- v0.6.0: `bible-lookup-search` keyword search via BibleGateway quicksearch
+  (`?quicksearch=<query>&version=<code>`, parameters verified against the live
+  site). Named with the `bible-lookup-` prefix per package-lint, not
+  `bible-search` as originally sketched.
 - v0.5.0: `bible-lookup-parallel` opens a reference in two translations side by
   side (`&version=A;B`); `bible-lookup--build-url` takes an optional versions
   list.
