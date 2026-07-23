@@ -4,11 +4,6 @@ Feature ideas, roughly ordered by value-to-effort. No ELPA/MELPA submission plan
 
 ## Smaller conveniences
 
-- Parallel passage view: BibleGateway supports `version=KJV;ESV` for
-  side-by-side translations; prompt for two versions. Browser-based, no
-  in-buffer rendering involved.
-- Org-mode link type: register a `bible:` link so `[[bible:John 3:16]]` is
-  clickable and exports properly.
 - Keyword search mode: `bible-search` command using BibleGateway's quicksearch
   for word/phrase queries, not just references.
 
@@ -17,9 +12,13 @@ Feature ideas, roughly ordered by value-to-effort. No ELPA/MELPA submission plan
 - Fetch into a buffer: would mean API calls, then caching, then probably
   bundling the whole Bible as JSON — unwanted complexity. Staying a thin
   browser wrapper.
+- Org-mode link type: Danny doesn't use Org.
 
 ## Done
 
+- v0.5.0: `bible-lookup-parallel` opens a reference in two translations side by
+  side (`&version=A;B`); `bible-lookup--build-url` takes an optional versions
+  list.
 - v0.4.0: `bible-lookup-again` reopens the last lookup (prefix arg = different
   translation); `bible-lookup-at-point` now records what it opens in
   `bible-lookup-history`.

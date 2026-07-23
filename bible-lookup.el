@@ -1,7 +1,7 @@
 ;;; bible-lookup.el --- Look up Bible passages on BibleGateway  -*- lexical-binding: t; -*-
 
 ;; Author: Danny Feller <danny@dfeller.xyz>
-;; Version: 0.4.0
+;; Version: 0.5.0
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: convenience, hypermedia
 ;; URL: https://github.com/486DX2-boomer/bible-lookup
@@ -94,20 +94,26 @@ an optional \":verse\" and \"-range\".")
 (defvar bible-lookup-version-history nil
   "Minibuffer history for translation prompts.")
 
-(defun bible-lookup--read-version ()
-  "Prompt for a translation code, defaulting to `bible-lookup-version'."
+(defun bible-lookup--read-version (&optional prompt default)
+  "Prompt for a translation code with completion.
+PROMPT defaults to a generic prompt; DEFAULT, which may be nil,
+is offered as the default input."
   (completing-read
-   (format "Translation (default %s): " bible-lookup-version)
+   (or prompt (format "Translation (default %s): " bible-lookup-version))
    bible-lookup-version-codes
-   nil nil nil 'bible-lookup-version-history bible-lookup-version))
+   nil nil nil 'bible-lookup-version-history default))
 
-(defun bible-lookup--build-url (reference)
+(defun bible-lookup--build-url (reference &optional versions)
   "Return the BibleGateway URL for REFERENCE.
 REFERENCE is a string such as \"Genesis 1:1\" or \"Psalm 23\".
-The translation is taken from `bible-lookup-version'."
+Optional VERSIONS is a list of translation codes shown side by
+side; it defaults to `bible-lookup-version' alone."
   (concat bible-lookup-base-url
           "?search=" (url-hexify-string reference)
-          "&version=" (url-hexify-string bible-lookup-version)))
+          "&version="
+          (mapconcat #'url-hexify-string
+                     (or versions (list bible-lookup-version))
+                     ";")))
 
 (defun bible-lookup--reference-at-point ()
   "Return the Bible reference at point, or nil if there is none."
@@ -150,7 +156,8 @@ Optional argument VERSION overrides `bible-lookup-version' for
 this lookup; interactively, a prefix argument (\\[universal-argument]) prompts
 for it."
   (interactive
-   (let* ((version (and current-prefix-arg (bible-lookup--read-version)))
+   (let* ((version (and current-prefix-arg
+                        (bible-lookup--read-version nil bible-lookup-version)))
           (default (bible-lookup--reference-at-point)))
      (list (completing-read
             (format "Bible reference (%s)%s: "
@@ -172,7 +179,8 @@ Optional argument VERSION overrides `bible-lookup-version' for
 this lookup; interactively, a prefix argument (\\[universal-argument]) prompts
 for it."
   (interactive
-   (list (and current-prefix-arg (bible-lookup--read-version))))
+   (list (and current-prefix-arg
+              (bible-lookup--read-version nil bible-lookup-version))))
   (let ((reference (bible-lookup--reference-at-point)))
     (unless reference
       (user-error "No Bible reference at point"))
@@ -188,11 +196,37 @@ this lookup; interactively, a prefix argument (\\[universal-argument]) prompts
 for it, making it easy to reread the same passage in another
 translation."
   (interactive
-   (list (and current-prefix-arg (bible-lookup--read-version))))
+   (list (and current-prefix-arg
+              (bible-lookup--read-version nil bible-lookup-version))))
   (unless bible-lookup-history
     (user-error "No previous lookup"))
   (let ((bible-lookup-version (or version bible-lookup-version)))
     (browse-url (bible-lookup--build-url (car bible-lookup-history)))))
+
+;;;###autoload
+(defun bible-lookup-parallel (reference version-a version-b)
+  "Look up REFERENCE in two translations side by side on BibleGateway.
+VERSION-A and VERSION-B are the translation codes to compare,
+e.g. \"KJV\" and \"ESV\".  Interactively, prompt for the
+reference (defaulting to the reference at point) and both
+translations."
+  (interactive
+   (let ((default (bible-lookup--reference-at-point)))
+     (list (completing-read
+            (format "Bible reference%s: "
+                    (if default (format " (default %s)" default) ""))
+            #'bible-lookup--completion-table
+            nil nil nil 'bible-lookup-history default)
+           (bible-lookup--read-version
+            (format "First translation (default %s): " bible-lookup-version)
+            bible-lookup-version)
+           (bible-lookup--read-version "Second translation: "))))
+  (when (string-blank-p reference)
+    (user-error "No reference given"))
+  (when (or (string-blank-p version-a) (string-blank-p version-b))
+    (user-error "Two translations are required"))
+  (browse-url (bible-lookup--build-url (string-trim reference)
+                                       (list version-a version-b))))
 
 (provide 'bible-lookup)
 ;;; bible-lookup.el ends here
