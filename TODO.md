@@ -22,6 +22,8 @@ Feature ideas, roughly ordered by value-to-effort. No ELPA/MELPA submission plan
 
 ## Done
 
+- v0.7.0: `bible-lookup-search-at-point` keyword-searches the word under the
+  cursor (`thing-at-point`, built-in thingatpt.el — no external dependency).
 - v0.6.0: `bible-lookup-search` keyword search via BibleGateway quicksearch
   (`?quicksearch=<query>&version=<code>`, parameters verified against the live
   site). Named with the `bible-lookup-` prefix per package-lint, not

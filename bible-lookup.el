@@ -1,7 +1,7 @@
 ;;; bible-lookup.el --- Look up Bible passages on BibleGateway  -*- lexical-binding: t; -*-
 
 ;; Author: Danny Feller <danny@dfeller.xyz>
-;; Version: 0.6.0
+;; Version: 0.7.0
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: convenience, hypermedia
 ;; URL: https://github.com/486DX2-boomer/bible-lookup
@@ -22,6 +22,7 @@
 ;;; Code:
 
 (require 'browse-url)
+(require 'thingatpt)
 (require 'url-util)
 
 (defgroup bible-lookup nil
@@ -254,6 +255,22 @@ argument (\\[universal-argument]) prompts for it."
    (concat bible-lookup-search-url
            "?quicksearch=" (url-hexify-string (string-trim query))
            "&version=" (url-hexify-string (or version bible-lookup-version)))))
+
+;;;###autoload
+(defun bible-lookup-search-at-point (&optional version)
+  "Search BibleGateway for the word at point.
+Signal an error if there is no word under the cursor.  Optional
+argument VERSION overrides `bible-lookup-version' for this
+search; interactively, a prefix argument (\\[universal-argument]) prompts for
+it."
+  (interactive
+   (list (and current-prefix-arg
+              (bible-lookup--read-version nil bible-lookup-version))))
+  (let ((word (thing-at-point 'word t)))
+    (unless word
+      (user-error "No word at point"))
+    (add-to-history 'bible-lookup-search-history word)
+    (bible-lookup-search word version)))
 
 (provide 'bible-lookup)
 ;;; bible-lookup.el ends here
