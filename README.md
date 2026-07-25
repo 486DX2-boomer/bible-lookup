@@ -40,7 +40,7 @@ For example if you have `.emacs.d/lisp/bible-lookup.el`, do:
 
 ```elisp
 (use-package bible-lookup
-  :load-path (expand-file-name "lisp" user-emacs-directory)
+  :load-path "lisp"
   :demand t)
 ```
 
