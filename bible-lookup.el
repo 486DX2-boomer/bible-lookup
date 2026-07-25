@@ -1,7 +1,7 @@
 ;;; bible-lookup.el --- Look up Bible passages on BibleGateway  -*- lexical-binding: t; -*-
 
 ;; Author: Danny Feller <danny@dfeller.xyz>
-;; Version: 0.7.0
+;; Version: 0.8.0
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: convenience, hypermedia
 ;; URL: https://github.com/486DX2-boomer/bible-lookup
@@ -50,6 +50,9 @@ entered even if it is not in this list."
 
 (defconst bible-lookup-search-url "https://www.biblegateway.com/quicksearch/"
   "Base URL for BibleGateway keyword searches.")
+
+(defconst bible-lookup-lexicon-url "https://www.blueletterbible.org/search/search.cfm"
+  "Base URL for Blue Letter Bible lexical concordance searches.")
 
 (defconst bible-lookup--book-names
   '("Genesis" "Exodus" "Leviticus" "Numbers" "Deuteronomy"
@@ -100,6 +103,9 @@ an optional \":verse\" and \"-range\".")
 
 (defvar bible-lookup-search-history nil
   "Minibuffer history for `bible-lookup-search'.")
+
+(defvar bible-lookup-lexicon-history nil
+  "Minibuffer history for `bible-lookup-lexicon'.")
 
 (defun bible-lookup--read-version (&optional prompt default)
   "Prompt for a translation code with completion.
@@ -271,6 +277,48 @@ it."
       (user-error "No word at point"))
     (add-to-history 'bible-lookup-search-history word)
     (bible-lookup-search word version)))
+
+(defun bible-lookup--build-lexicon-url (term &optional version)
+  "Return the Blue Letter Bible lexicon search URL for TERM.
+Optional VERSION overrides `bible-lookup-version'."
+  (concat bible-lookup-lexicon-url
+          "?Criteria=" (url-hexify-string term)
+          "&t=" (url-hexify-string (or version bible-lookup-version))
+          "&lexcSt=2"
+          "#s=s_lexiconc"))
+
+;;;###autoload
+(defun bible-lookup-lexicon (term &optional version)
+  "Search the Blue Letter Bible lexical concordance for TERM.
+TERM is an English word or phrase (\"buckler\"); the results link
+each occurrence to its underlying Hebrew or Greek word.  Optional
+argument VERSION overrides `bible-lookup-version' for this search;
+interactively, a prefix argument (\\[universal-argument]) prompts for it."
+  (interactive
+   (let ((version (and current-prefix-arg
+                       (bible-lookup--read-version nil bible-lookup-version))))
+     (list (read-string
+            (format "Lexicon search (%s): " (or version bible-lookup-version))
+            nil 'bible-lookup-lexicon-history)
+           version)))
+  (when (string-blank-p term)
+    (user-error "No search term given"))
+  (browse-url (bible-lookup--build-lexicon-url (string-trim term) version)))
+
+;;;###autoload
+(defun bible-lookup-lexicon-at-point (&optional version)
+  "Search the Blue Letter Bible lexical concordance for the word at point.
+Signal an error if there is no word under the cursor.  Optional
+argument VERSION overrides `bible-lookup-version' for this search;
+interactively, a prefix argument (\\[universal-argument]) prompts for it."
+  (interactive
+   (list (and current-prefix-arg
+              (bible-lookup--read-version nil bible-lookup-version))))
+  (let ((word (thing-at-point 'word t)))
+    (unless word
+      (user-error "No word at point"))
+    (add-to-history 'bible-lookup-lexicon-history word)
+    (bible-lookup-lexicon word version)))
 
 (provide 'bible-lookup)
 ;;; bible-lookup.el ends here

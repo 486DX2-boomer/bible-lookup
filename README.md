@@ -10,6 +10,8 @@ Look up Bible passages on [BibleGateway](https://www.biblegateway.com/) from Ema
 - `M-x bible-lookup-parallel` — prompt for a reference and two translations, then open them side by side on BibleGateway.
 - `M-x bible-lookup-search` — keyword search across the whole text (`in Christ`), not a reference lookup. With `C-u`, prompts for the translation.
 - `M-x bible-lookup-search-at-point` — keyword search of the word under the cursor.
+- `M-x bible-lookup-lexicon` — lexical concordance search on [Blue Letter Bible](https://www.blueletterbible.org/), linking each hit to its Hebrew or Greek word. With `C-u`, prompts for the translation.
+- `M-x bible-lookup-lexicon-at-point` — lexicon search of the word under the cursor.
 
 With a prefix argument (`C-u`), either command first prompts for the translation for that one lookup, without changing `bible-lookup-version`.
 
@@ -28,7 +30,8 @@ Or with `use-package`:
   :load-path "/path/to/bible-lookup/"
   :commands (bible-lookup bible-lookup-at-point bible-lookup-again
              bible-lookup-parallel bible-lookup-search
-             bible-lookup-search-at-point))
+             bible-lookup-search-at-point bible-lookup-lexicon
+             bible-lookup-lexicon-at-point))
 ```
 
 ## Configuration
