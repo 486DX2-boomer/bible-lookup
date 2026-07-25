@@ -17,13 +17,7 @@ With a prefix argument (`C-u`), either command first prompts for the translation
 
 ## Installation
 
-```elisp
-(add-to-list 'load-path "/path/to/bible-lookup/")
-(autoload 'bible-lookup "bible-lookup" "Look up a Bible passage on BibleGateway." t)
-(autoload 'bible-lookup-at-point "bible-lookup" "Look up the Bible reference at point." t)
-```
-
-Or with `use-package`:
+If you want autoloads:
 
 ```elisp
 (use-package bible-lookup
@@ -32,6 +26,22 @@ Or with `use-package`:
              bible-lookup-parallel bible-lookup-search
              bible-lookup-search-at-point bible-lookup-lexicon
              bible-lookup-lexicon-at-point))
+```
+
+Otherwise use `:demand t`:
+
+```elisp
+(use-package bible-lookup
+  :load-path "/path/to/bible-lookup/"
+  :demand t)
+```
+
+For example if you have `.emacs.d/lisp/bible-lookup.el`, do:
+
+```elisp
+(use-package bible-lookup
+  :load-path (expand-file-name "lisp" user-emacs-directory)
+  :demand t)
 ```
 
 ## Configuration
