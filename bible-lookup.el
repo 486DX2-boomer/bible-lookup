@@ -1,7 +1,7 @@
 ;;; bible-lookup.el --- Look up Bible passages on BibleGateway  -*- lexical-binding: t; -*-
 
 ;; Author: Danny Feller <danny@dfeller.xyz>
-;; Version: 0.8.0
+;; Version: 0.9.0
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: convenience, hypermedia
 ;; URL: https://github.com/486DX2-boomer/bible-lookup
@@ -143,6 +143,15 @@ side; it defaults to `bible-lookup-version' alone."
           (setq found (match-string-no-properties 0)))))
     found))
 
+(defun bible-lookup--region-string ()
+  "Return the active region as a trimmed string, or nil if there is none."
+  (when (use-region-p)
+    (let ((text (string-trim
+                 (buffer-substring-no-properties
+                  (region-beginning) (region-end)))))
+      (unless (string-blank-p text)
+        text))))
+
 (defun bible-lookup--completion-table (string pred action)
   "Completion table for Bible references.
 Completes STRING against book names until a chapter number
@@ -249,11 +258,14 @@ text, not a reference lookup.  Optional argument VERSION overrides
 `bible-lookup-version' for this search; interactively, a prefix
 argument (\\[universal-argument]) prompts for it."
   (interactive
-   (let ((version (and current-prefix-arg
-                       (bible-lookup--read-version nil bible-lookup-version))))
+   (let* ((version (and current-prefix-arg
+                        (bible-lookup--read-version nil bible-lookup-version)))
+          (default (bible-lookup--region-string)))
      (list (read-string
-            (format "Bible search (%s): " (or version bible-lookup-version))
-            nil 'bible-lookup-search-history)
+            (format "Bible search (%s)%s: "
+                    (or version bible-lookup-version)
+                    (if default (format " (default %s)" default) ""))
+            nil 'bible-lookup-search-history default)
            version)))
   (when (string-blank-p query)
     (user-error "No search query given"))
