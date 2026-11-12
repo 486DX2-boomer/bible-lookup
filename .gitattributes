@@ -1,3 +1,5 @@
 * text=auto
 *.el text eol=lf
 *.md text eol=lf
+*.tsv text eol=lf
+*.py text eol=lf

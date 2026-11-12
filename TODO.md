@@ -15,12 +15,18 @@ Feature ideas, roughly ordered by value-to-effort. No ELPA/MELPA submission plan
 
 ## Rejected
 
-- Fetch into a buffer: would mean API calls, then caching, then probably
-  bundling the whole Bible as JSON — unwanted complexity. Staying a thin
-  browser wrapper.
+- Fetch into a buffer via an API: would mean API calls and caching. Superseded
+  by the bundled local KJV (v0.10.0), which needs neither.
 - Org-mode link type: Danny doesn't use Org.
 
 ## Done
+
+- v0.10.0: offline backend. `bible-lookup-backend` (`web` default, `local`)
+  routes `bible-lookup`, `-at-point`, `-again` and `-search` to a bundled KJV
+  (`kjv.tsv`, generated from eBible.org's public-domain text by
+  `tools/make-kjv-tsv.py`). Read-only `*KJV*` reader in a split window and
+  occur-style `*KJV search*`. An explicit non-KJV `C-u` version falls back to
+  the web.
 
 - v0.7.0: `bible-lookup-search-at-point` keyword-searches the word under the
   cursor (`thing-at-point`, built-in thingatpt.el — no external dependency).
